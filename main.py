@@ -1,67 +1,128 @@
 from tkinter import *
-import math
+from instrukcia import instrukcia,zahadny_bod
+from kreslenie import kresli
+from matematika import vzdialenost_dvoch_bodov
 
-class bod(Label):
-    # def __init__(self, x, y):
-    #     self.x = x
-    #     self.y = y
-    pass
+print(TkVersion)
+#toto je ten subor, ktory treba spustat
+#je tu implementacia pridavania novych bodov, pridavania instrukcii na geometricke konstrukcie
 
-class usecka:
-    def __init__(self, bod1, bod2):
-        self.bod1 = bod1
-        self.bod2 = bod2
-
-class kruznica:
-    def __init__(self, bod_stredu, bod_obvodu):
-        self.bod_stredu = bod_stredu
-        self.bod_obvodu = bod_obvodu
-
+farba_hover_bodu = "yellow"
+farba_normalny_bod = "red"
+farba_priesecnik = "blue"
+default_napoveda = "tukni na nejake tlacidlo"
+napoveda_text = {"usecka" : "tukni na dva body", 
+                 "priamka" : "tukni na dva body",
+                 "polpriamka" : "tukni na dva body",
+                 "kruznica" : "tukni na stred, potom na bod na obvode",
+                 "os_usecky" : "tukni na koncove body usecky",
+                 "os_uhla" : "tukni na nejake tri body, ten druhy ma byt ten pri ktorom je ten uhol",
+                 "kolmica" : "tukni na nejaky bod, a potom na nejake dva body urcujuce priamku, nakresli sa kolmica z toho bodu",
+                 "rovnobezka" : "tukni na nejaky bod, a potom na nejake dva body urcujuce priamku, nakresli sa rovnobezka cez ten bod"
+                 }
 class Pridavanie_objektov:
-    tuknute_body = []#pre usecky
-    pridavam_usecku = False
-    pridavam_kruznicu = False
+    tuknute_body = [] #aby konstrukcia vedela ktorych bodov sa tyka
+    pridavam = {"usecka":False,"polpriamka":False,"priamka":False,"kruznica":False,"os_usecky":False,"os_uhla":False,"kolmica":False,"rovnobezka":False}
 
-def vzdialenost_dvoch_bodov(a, b):
-    return math.sqrt((a.winfo_x() - b.winfo_x())**2 + (a.winfo_y() - b.winfo_y())**2)
+def on_enter(event):
+    event.widget.config(bg=farba_hover_bodu)
 
-def rovnica_priamky_podla_bodov(x1, y1, x2, y2):#vrati a, b, c tak aby priamka bola: ax + by +c = 0
-    a = (y1 - y2)/(x1 - x2)
-    return a, -1, y1 - a*x1
+def on_leave_normalny(event):
+    event.widget.config(bg=farba_normalny_bod)
 
-def cross_product(x1, y1, x2, y2):
-    return x1*y2 - x2*y1
+def on_leave_priesecnik(event):
+    event.widget.config(bg=farba_priesecnik)
 
-def je_to_rovnaky_bod(x1, y1, x2, y2):
-    return abs(x1-x2) < 5 and abs(y1-y2) < 5
+def usecka_btn():
+    napoveda.config(text=napoveda_text["usecka"])
+    vyrobit_objekt("usecka")
 
-def zrataj_priesecnik(e, f):
-    e1x, e1y, e2x, e2y = e.bod1.winfo_x(), e.bod1.winfo_y(), e.bod2.winfo_x(), e.bod2.winfo_y()
-    f1x, f1y, f2x, f2y = f.bod1.winfo_x(), f.bod1.winfo_y(), f.bod2.winfo_x(), f.bod2.winfo_y()
-    if isinstance(e, usecka) and isinstance(f, usecka):
-        a1,b1,c1 = rovnica_priamky_podla_bodov(e1x, e1y, e2x, e2y)
-        a2,b2,c2 = rovnica_priamky_podla_bodov(f1x, f1y, f2x, f2y)
-        x = (b1*c2 - b2*c1)/(a1*b2 - a2*b1)
-        y = (c1*a2 - c2*a1)/(a1*b2 - a2*b1)
-        if ((cross_product(e2x - e1x, e2y - e1y, f1x - e1x, f1y - e1y) > 0) ^ (cross_product(e2x - e1x, e2y - e1y, f2x - e1x, f2y - e1y) > 0)) and ((cross_product(f2x - f1x, f2y - f1y, e1x - f1x, e1y - f1y) > 0) ^ (cross_product(f2x - f1x, f2y - f1y, e2x - f1x, e2y - f1y) > 0)):
-            if not je_to_rovnaky_bod(e1x, e1y, x, y) and not je_to_rovnaky_bod(e2x, e2y, x, y) and not je_to_rovnaky_bod(f1x, f1y, x, y) and not je_to_rovnaky_bod(f2x, f2y, x, y):
-                return (x,y)
-            return -1 # neni to priesecnik, ak to je jeden z koncovych bodov 
-        else:
-            return -1
-    if isinstance(e, kruznica) and isinstance(f, kruznica):
-        return -1
-    if isinstance(e, usecka) and f.isinstance(f, kruznica):
-        return -1
-    if isinstance(e, kruznica) and isinstance(f, usecka):
-        return -1
+def priamka_btn():
+    napoveda.config(text=napoveda_text["priamka"])
+    vyrobit_objekt("priamka")
+
+def polpriamka_btn():
+    napoveda.config(text=napoveda_text["polpriamka"])
+    vyrobit_objekt("polpriamka")
+
+def kruznica_btn():
+    napoveda.config(text=napoveda_text["kruznica"])
+    vyrobit_objekt("kruznica")
+
+def os_usecky_btn():
+    napoveda.config(text=napoveda_text["os_usecky"])
+    vyrobit_objekt("os_usecky")
+
+def os_uhla_btn():
+    napoveda.config(text=napoveda_text["os_uhla"])
+    vyrobit_objekt("os_uhla")
+
+def kolmica_btn():
+    napoveda.config(text=napoveda_text["kolmica"])
+    vyrobit_objekt("kolmica")
+
+def rovnobezka_btn():
+    napoveda.config(text=napoveda_text["rovnobezka"])
+    vyrobit_objekt("rovnobezka")
+
+def os_usecky_postup(parametre):
+    a, b = parametre
+    k1 = instrukcia("kruznica", a, b, schovat=True)
+    k2 = instrukcia("kruznica", b, a, schovat=True)
+    return [k1, k2, instrukcia("priamka", zahadny_bod("priesecnik", k1, k2, 0), zahadny_bod("priesecnik", k1, k2, 1))]
+
+def os_uhla_postup(parametre):
+    #kruznica s nahodnym polomerom
+    a,b,c = parametre
+    bod_obvodu_prvej_kruznice = zahadny_bod("normalny", (-10, -10))#aj tu je to pokazene
+    k0 = instrukcia("kruznica", b, bod_obvodu_prvej_kruznice, schovat=True)
+    pa = instrukcia("polpriamka", b, a, schovat=True)
+    pc = instrukcia("polpriamka", b, c, schovat=True)
+    p1 = zahadny_bod("priesecnik", pa, k0, 0)
+    p2 = zahadny_bod("priesecnik", pc, k0, 0)
+    # skopirovany postup os usecky - mozno to neni idealne, ale tak
+    k1 = instrukcia("kruznica", p1, p2, schovat=True)
+    k2 = instrukcia("kruznica", p2, p1, schovat=True)
+    return [pa, pc, k0, k1, k2, instrukcia("priamka", zahadny_bod("priesecnik", k1, k2, 0), zahadny_bod("priesecnik", k1, k2, 1))]
+
+def kolmica_postup(parametre): #funguje  prvy bod je ten mimo priamky, drune dva su na priamke
+    a,b,c = parametre
+    bod_obvodu = zahadny_bod("normalny", (2000, 0))#ten bod obvodu sa nemeni  pozor na to aby to nebolo viac ako ta konstanta v kresli pre usecky
+    k = instrukcia("kruznica", a, bod_obvodu, schovat=True)
+    p = instrukcia("priamka", b, c, schovat=True)
+    c1 = zahadny_bod("priesecnik", k, p, 0)
+    c2 = zahadny_bod("priesecnik", k, p, 1)
+    return [k, p] + os_usecky_postup((c1, c2))
+
+def rovnobezka_postup(parametre): # druhe dva body definuju priamku
+    a,b,c = parametre
+    kolmica = kolmica_postup((a,b,c))
+    g = zahadny_bod("priesecnik", kolmica[-1], kolmica[1], 0)
+    return kolmica + kolmica_postup((a, a, g))
+
+# def opisana_kruznica_postup(): to sa mi nechce uz robit
+#     return
+
+# def dotycnica_postup():
+#     return
+
+def vyrobit_objekt(co):
+    for i in PO.pridavam:
+        PO.pridavam[i] = False
+    PO.pridavam[co] = True
+    PO.tuknute_body = []
 
 def tuknuty_bod(event):
     widget = event.widget
-    if widget not in PO.tuknute_body:
-        PO.tuknute_body.append(widget)
-    pridat_usecku()
-    pridat_kruznicu()
+    PO.tuknute_body.append(widget)
+    pridat_zakladny_objekt("usecka", 2)
+    pridat_zakladny_objekt("priamka", 2)
+    pridat_zakladny_objekt("polpriamka", 2)
+    pridat_zakladny_objekt("kruznica", 2)
+    pridat_objekt("os_usecky", 2, os_usecky_postup)
+    pridat_objekt("os_uhla", 3, os_uhla_postup)
+    pridat_objekt("kolmica", 3, kolmica_postup)
+    pridat_objekt("rovnobezka", 3, rovnobezka_postup)
 
 def tuknuty_nepriesecnik(event):
     widget = event.widget
@@ -70,75 +131,80 @@ def tuknuty_nepriesecnik(event):
 
 def dragUpdate(event):
     widget = event.widget
-    widget.place(x=widget.winfo_x() - widget.start_pos[0] + event.x, y=widget.winfo_y() - widget.start_pos[1] + event.y, width=10, height=10)
+    novy_pos = (widget.winfo_x() - widget.start_pos[0] + event.x, widget.winfo_y() - widget.start_pos[1] + event.y)
+    widget.place(x=novy_pos[0], y=novy_pos[1], width=10, height=10)
+    body_canvas[widget].state.pos = novy_pos
     canvas_update()
 
-def pridat_usecku():
-    if len(PO.tuknute_body) == 2 and PO.pridavam_usecku:
-        usecky.append(usecka(PO.tuknute_body[0], PO.tuknute_body[1]))
+def pridat_zakladny_objekt(co, pocet_bodov):
+    if len(PO.tuknute_body) == pocet_bodov and PO.pridavam[co]:
+        instrukcie.append(instrukcia(co, body_canvas[PO.tuknute_body[0]], body_canvas[PO.tuknute_body[1]]))
         PO.tuknute_body = []
-        PO.pridavam_usecku = False
+        PO.pridavam[co] = False
         canvas_update()
-
-def pridat_kruznicu():
-    if len(PO.tuknute_body) == 2 and PO.pridavam_kruznicu:
-        kruznice.append(kruznica(PO.tuknute_body[0], PO.tuknute_body[1]))
+        napoveda.config(text=default_napoveda)
+    
+def pridat_objekt(co, pocet_bodov, postup_rysovania):
+    if len(PO.tuknute_body) == pocet_bodov and PO.pridavam[co]:
+        body = []
+        for i in range(pocet_bodov):
+            body.append(body_canvas[PO.tuknute_body[i]])
+        for i in postup_rysovania(body):
+            instrukcie.append(i)
         PO.tuknute_body = []
-        PO.pridavam_kruznicu = False
+        PO.pridavam[co] = False
         canvas_update()
+        napoveda.config(text=default_napoveda)
 
-def pridat_bod(x=100, y=100):
-    novy_bod = Label(canvas, bg="red")
-    canvas.create_window(x,y, window=novy_bod, width=10, height=10)
-    novy_bod.bind("<Button-1>", tuknuty_nepriesecnik)
-    novy_bod.bind("<B1-Motion>", dragUpdate)
-    body.append(bod(novy_bod))
 
 def canvas_update():
     canvas.delete("ciara")
-
-    neexistujuce_priesecniky = []
-    for i in range(len(usecky)):
-        for j in range(i+1, len(usecky)):
-            objekty = (usecky[i], usecky[j])
-            priesecnik = zrataj_priesecnik(objekty[0], objekty[1])
-            if priesecnik != -1:
-                if objekty not in priesecniky:
-                    novy_bod = Label(canvas, bg="blue")
-                    novy_bod.bind("<Button-1>", tuknuty_bod)
-                    priesecniky[objekty] = novy_bod
-                    canvas.create_window(priesecnik[0], priesecnik[1], window=novy_bod, width=10, height=10)
-                priesecniky[objekty].place(x=priesecnik[0], y=priesecnik[1], width=10, height=10)
-            else:
-                if objekty in priesecniky:
-                    # print(test,"davam nieco uplne prec",priesecniky[objekty])
-                    priesecniky[objekty].place(x=1000000, y=1000000, width=10, height=10)
-                    neexistujuce_priesecniky.append(priesecniky[objekty])
-    
-    for usecka in usecky:
-        if usecka.bod1 not in neexistujuce_priesecniky and usecka.bod2 not in neexistujuce_priesecniky:
-            canvas.create_line(usecka.bod1.winfo_x(), usecka.bod1.winfo_y(), usecka.bod2.winfo_x(), usecka.bod2.winfo_y(), tags="ciara")
-            # print(test, "kreslim ciaru")
-
+    cervene_body = []
+    for a in body_canvas:
+        c = body_canvas[a]
+        if c.typ == "normalny":
+            cervene_body.append(c)
+    usecky, kruznice, priesecniky = kresli(instrukcie, cervene_body)
+    for u in usecky:
+        canvas.create_line(u[0][0]+5, u[0][1]+5, u[1][0]+5, u[1][1]+5, tags="ciara")
     for k in kruznice:
-        if k.bod_stredu not in neexistujuce_priesecniky and k.bod_obvodu not in neexistujuce_priesecniky:
-            radius = vzdialenost_dvoch_bodov(k.bod_stredu, k.bod_obvodu)
-            canvas.create_oval(k.bod_stredu.winfo_x() - radius, k.bod_stredu.winfo_y() - radius, k.bod_stredu.winfo_x() + radius, k.bod_stredu.winfo_y() + radius, outline="black", width=2, tags="ciara")
+        radius = vzdialenost_dvoch_bodov(k[0], k[1])
+        canvas.create_oval(k[0][0] - radius+5, k[0][1] - radius+5, k[0][0] + radius+5, k[0][1] + radius+5, outline="black", width=2, tags="ciara")
 
-def vyrobit_usecku_btn():
-    PO.pridavam_usecku = True
-    PO.tuknute_body = []
+    mam_nakreslit = set()
+    for pos, p in priesecniky:
+        mam_nakreslit.add(p)
+        if p in priesecniky_label:
+            priesecniky_label[p].place(x=pos[0], y=pos[1], width=10, height=10)
+        else:
+            novy_bod = Label(canvas, bg=farba_priesecnik) #modry
+            novy_bod.bind("<Button-1>", tuknuty_bod) #to je ta funkcia na pridavanie useciek a kruznic
+            novy_bod.bind("<Enter>", on_enter)
+            novy_bod.bind("<Leave>", on_leave_priesecnik)
+            canvas.create_window(pos[0], pos[1], window=novy_bod, width=10, height=10)
+            novy_bod.place(x=pos[0], y=pos[1], width=10, height=10)
+            priesecniky_label[p] = novy_bod
+        if p not in body_canvas:
+            body_canvas[priesecniky_label[p]] = p
 
-def vyrobit_kruznicu_btn():
-    PO.pridavam_kruznicu = True
-    PO.tuknute_body = []
+    for p in priesecniky_label:
+        if p not in mam_nakreslit: #nemam ho kreslit
+            priesecniky_label[p].place(x=100000, y=0, width=10, height=10) #nakreslim ho niekde fuc
 
-test = 0
-body = []
-priesecniky = {}#(objekt1, objekt2) : bod
-usecky = []
-kruznice = []
+def pridat_bod(x=100, y=100):
+    novy_bod = Label(canvas, bg=farba_normalny_bod)
+    canvas.create_window(x,y, window=novy_bod, width=10, height=10)
+    novy_bod.place(x=x, y=y, width=10, height=10)
+    novy_bod.bind("<Button-1>", tuknuty_nepriesecnik)
+    novy_bod.bind("<B1-Motion>", dragUpdate)
+    novy_bod.bind("<Enter>", on_enter)
+    novy_bod.bind("<Leave>", on_leave_normalny)
+    body_canvas[novy_bod] = zahadny_bod("normalny",(x,y))
+
 PO = Pridavanie_objektov()
+instrukcie = []# bude obsahovat aj body
+body_canvas = {}# Label: zahadnybod   tu budu aj priesecniky
+priesecniky_label = {}# zahadnybodpriesecnik : Label
 
 sirka_obrazovky = 1000
 vyska_obrazovky = 800
@@ -149,47 +215,36 @@ root.title("Zapoctak")
 root.geometry(str(sirka_obrazovky) + "x" + str(vyska_obrazovky))
 
 btn_pridaj_bod = Button(root, text="Pridaj Bod", command=pridat_bod, bg="lightgray")
-btn_pridaj_bod.pack(padx=20, pady=20)
+btn_pridaj_bod.grid(row=0,column=0)
 
-btn_usecka = Button(root, text="usecka", bg="lightgray", command=vyrobit_usecku_btn)
-btn_usecka.pack()
-btn_kruznica = Button(root, text="kruznica", bg="lightgray", command=vyrobit_kruznicu_btn)
-btn_kruznica.pack()
+napoveda = Label(root, text=default_napoveda)
+napoveda.grid(row=0, column=1, columnspan=7)
+
+btn_usecka = Button(root, text="usecka", bg="lightgray", command=usecka_btn)
+btn_usecka.grid(row=1,column=0)
+btn_priamka = Button(root, text="priamka", bg="lightgray", command=priamka_btn)
+btn_priamka.grid(row=1,column=1)
+btn_polpriamka = Button(root, text="polpriamka", bg="lightgray", command=polpriamka_btn)
+btn_polpriamka.grid(row=1,column=2)
+btn_kruznica = Button(root, text="kruznica", bg="lightgray", command=kruznica_btn)
+btn_kruznica.grid(row=1,column=3)
+
+btn_os_usecky = Button(root, text="os_usecky", bg="lightgray", command=os_usecky_btn)
+btn_os_usecky.grid(row=1,column=4)
+btn_os_uhla = Button(root, text="os_uhla", bg="lightgray", command=os_uhla_btn)
+btn_os_uhla.grid(row=1,column=5)
+btn_kolmica = Button(root, text="kolmica", bg="lightgray", command=kolmica_btn)
+btn_kolmica.grid(row=1,column=6)
+btn_rovnobezka = Button(root, text="rovnobezka", bg="lightgray", command=rovnobezka_btn)
+btn_rovnobezka.grid(row=1,column=7)
+
 
 canvas = Canvas(root, width=vyska_obrazovky, height=sirka_obrazovky, bg="#AAD0AA")
-pridat_bod(100,100)
-pridat_bod(100,200)
-pridat_bod(200,100)
-pridat_bod(200,200)
+pridat_bod(200,10)
+pridat_bod(100,50)
+pridat_bod(300,180)
+pridat_bod(100,310)
 
-canvas.pack(fill="both", expand=True)
+canvas.grid(row=2,column=0, columnspan=8)#.pack(fill="both", expand=True)
 
 mainloop()
-
-"""
-bugy:
-pretnutie troch objektov v jednom bode je undefined - teda budu tam tri priesecniky, je otazne, ktory bude navrchu, a z ktoreho sa budu kreslit ciary teda
-
-todo:
-pridat bodom moznost desatinnych suradnic
-priesecniky
-usecka neni priamka
-
-blbosticky todo:
-zasvietit kliknute body pri kreslini usecok
-pridavanie bodov tak, ze kam kliknem sa prida
-
-
-potencialne divny dizajn:
-dufam ze ked zmenim nejaky bod v poli body, tak sa zmeni aj v poli usecky
-nepretnuty priesecnik existuje niekde uplne mimo
-
-nahodne divnosti:
-ked som tam mal len jednu cast zistovania pretinania useciek, 
-
-specifikacia zapoctaku predbezne:
-geogebra
-pridavat body, vediet ich posuvat
-vediet spravit usecku medzi dvomi bodmi
-
-"""

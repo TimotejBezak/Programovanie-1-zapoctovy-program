@@ -3,6 +3,8 @@ from instrukcia import instrukcia
 from instrukcia import zahadny_bod, priesecnik
 from matematika import usecka_usecka_priesecnik, predlz_usecku_donekonecna, kruznica_kruznica_priesecnik, kruznica_usecka_priesecnik, je_to_rovnaky_bod
 
+# zisti suradnice vsetkych bodov, podla instrukcii kreslenia
+
 def okresat_priesecniky_o_tie_co_su_na_cervenych_bodoch(pozicie):
     if pozicie == -1:
         return -1

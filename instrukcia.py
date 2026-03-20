@@ -1,4 +1,4 @@
-class zahadny_bod:
+class zahadny_bod: #je to bud priesecnik alebo bod s konkretnymi suradnicami
     def __init__(self, typ, *params):
         self.typ = typ
         if typ == "normalny":
@@ -10,13 +10,13 @@ class zahadny_bod:
         self.typ = "normalny"
         self.state = zakladny_bod(pos)
 
-class zakladny_bod:
+class zakladny_bod: #bod s konkretnymi suradnicami
     def __init__(self, pos):
         self.pos = pos
 
-class priesecnik:## moze byt nejaky koncovy bod nejakeho objektu - vtedy si ho pri kresleni vyratam a az potom to nakreslim, na konci kreslenia vyratam priesecniky vsetkym dvojiciam objektov
-    def __init__(self, o1, o2, ktory):#objekty ktorych priesecnik to je
-        self.ktory = ktory# parameter na rozlisenie priesecnikov ak maju dva objekty dva priesecniky
+class priesecnik: # bod definovany ako priesecnik nejakych dvoch objektov, musim najprv zistit suradnice tych objektov, aby som vedel kde ho mam nakreslit
+    def __init__(self, o1, o2, ktory): #objekty ktorych priesecnik to je
+        self.ktory = ktory # parameter na rozlisenie priesecnikov ak maju dva objekty dva priesecniky
         self.o1 = o1
         self.o2 = o2
 
@@ -52,9 +52,3 @@ class instrukcia(usecka, kruznica):
             polpriamka.__init__(self, *params)
         if typ == "kruznica":
             kruznica.__init__(self, *params)
-
-"""
-ako to bude fungovat:
-vykonam nejaku postupnost instrukcii, tym vzniknu nejake priesecniky - tie chcem vediet zadat ako parametre do instrukcii dalsej iteracie
-pridavanie bodu nie je instrukcia - ten bod je len parameter v dalsich instrukciach
-"""
