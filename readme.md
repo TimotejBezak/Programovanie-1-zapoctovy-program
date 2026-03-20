@@ -1,4 +1,4 @@
-Toto je môj zápočtový program. Na spustenie treba mať python a knižnicu tkinter (največšiu šancu na správne fungovanie má python 3.11 a tkinter 8.6). Spúšťa sa spustením súboru main.py.
+Toto je môj zápočtový program. Na spustenie treba mať python a knižnicu tkinter (največšiu šancu na správne fungovanie má python 3.11 a tkinter 8.6). Spúšťa sa spustením súboru main.py, všetky súbory musia byť v tom istom adresári.
 
 Pointa programu je slúžiť ako nástroj na rysovanie rôznych geometrických konštrukcií, s možnosťou hýbať jednotlivými bodmi za behu.
 
